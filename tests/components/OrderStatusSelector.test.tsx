@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 
 // Test Suite
 describe("OrderStatusSelector", () => {
-  const renderOrderStatusSelector = () => {
+  const renderComponent = () => {
     render(
       <Theme>
         <OrderStatusSelector onChange={vi.fn()} />
@@ -13,36 +13,25 @@ describe("OrderStatusSelector", () => {
     );
 
     return {
-      button: screen.getByRole("combobox"),
+      trigger: screen.getByRole("combobox"),
       user: userEvent.setup(),
+      getOptions: () => screen.findAllByRole("option"),
     };
   };
 
   it("should render New as the default value", () => {
-    // Arrange
-
-    // Act
-    const { button } = renderOrderStatusSelector();
-
-    // Assert
-    expect(button).toHaveTextContent(/new/i);
+    const { trigger } = renderComponent();
+    expect(trigger).toHaveTextContent(/new/i);
   });
 
   it("should render correct statuses", async () => {
-    // Arrange
+    const { trigger, user, getOptions } = renderComponent();
+    await user.click(trigger);
+    const options = await getOptions();
 
-    // Act
-    const { button, user } = renderOrderStatusSelector();
-    await user.click(button);
-
-    // Act
-    const options = await screen.findAllByRole("option");
-    // Assert
     expect(options).toHaveLength(3);
 
-    // Act
     const labels = options.map((option) => option.textContent);
-    // Assert
     expect(labels).toEqual(["New", "Processed", "Fulfilled"]);
   });
 });
